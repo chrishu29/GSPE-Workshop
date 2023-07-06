@@ -19,81 +19,81 @@ class MainMenu {
       crossAxisCount: 2,
       children: <Widget>[
         //Diagnosis Entry
-        GestureDetector(
-            onTapDown: (_) {
-              // btnState.isTap = true;
-              btnState = true;
-            },
-            onTapUp: (_) {
-              // btnState.isTap = false;
-              btnState = false;
-              Future.delayed(const Duration(milliseconds: 200), () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => const DiagnosisEntryDashboard()),
-                  (Route<dynamic> route) => false,
-                );
-              });
-            },
-            onTapCancel: () {
-              // btnState.isTap = false;
-              btnState = false;
-            },
-            child:
-                // Consumer<BtnState>(builder: (context, btnState, _) {
-                //   return
-                AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              transform: Matrix4.translationValues(0, btnState ? 5 : 0, 0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                      width: MediaQuery.of(context).orientation ==
-                              Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
-                      height: MediaQuery.of(context).orientation ==
-                              Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 2),
-                        color:
-                            btnState == true ? Colors.white : Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: btnState == true
-                            ? [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 3),
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.filter_tilt_shift),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Diagnosis Entry',
-                            style: TextStyle(
-                              fontSize: 15,
-                            ),
-                          )
-                        ],
-                      )),
-                ],
-              ),
-            )
-            // }),
-            ),
+        // GestureDetector(
+        //     onTapDown: (_) {
+        //       // btnState.isTap = true;
+        //       btnState = true;
+        //     },
+        //     onTapUp: (_) {
+        //       // btnState.isTap = false;
+        //       btnState = false;
+        //       Future.delayed(const Duration(milliseconds: 200), () {
+        //         Navigator.of(context).pushAndRemoveUntil(
+        //           MaterialPageRoute(
+        //               builder: (context) => const DiagnosisEntryDashboard()),
+        //           (Route<dynamic> route) => false,
+        //         );
+        //       });
+        //     },
+        //     onTapCancel: () {
+        //       // btnState.isTap = false;
+        //       btnState = false;
+        //     },
+        //     child:
+        //         // Consumer<BtnState>(builder: (context, btnState, _) {
+        //         //   return
+        //         AnimatedContainer(
+        //       duration: Duration(milliseconds: 200),
+        //       curve: Curves.easeInOut,
+        //       transform: Matrix4.translationValues(0, btnState ? 5 : 0, 0),
+        //       child: Column(
+        //         mainAxisAlignment: MainAxisAlignment.center,
+        //         children: [
+        //           AnimatedContainer(
+        //               duration: Duration(milliseconds: 200),
+        //               curve: Curves.easeInOut,
+        //               width: MediaQuery.of(context).orientation ==
+        //                       Orientation.portrait
+        //                   ? MediaQuery.of(context).size.height / 8
+        //                   : MediaQuery.of(context).size.width / 8,
+        //               height: MediaQuery.of(context).orientation ==
+        //                       Orientation.portrait
+        //                   ? MediaQuery.of(context).size.height / 8
+        //                   : MediaQuery.of(context).size.width / 8,
+        //               decoration: BoxDecoration(
+        //                 border: Border.all(color: Colors.black, width: 2),
+        //                 color:
+        //                     btnState == true ? Colors.white : Colors.blueAccent,
+        //                 borderRadius: BorderRadius.circular(10),
+        //                 boxShadow: btnState == true
+        //                     ? [
+        //                         BoxShadow(
+        //                           color: Colors.grey.withOpacity(0.3),
+        //                           spreadRadius: 5,
+        //                           blurRadius: 7,
+        //                           offset: Offset(0, 3),
+        //                         ),
+        //                       ]
+        //                     : [],
+        //               ),
+        //               child: Column(
+        //                 mainAxisAlignment: MainAxisAlignment.center,
+        //                 children: [
+        //                   Icon(Icons.filter_tilt_shift),
+        //                   const SizedBox(height: 5),
+        //                   Text(
+        //                     'Diagnosis Entry',
+        //                     style: TextStyle(
+        //                       fontSize: 15,
+        //                     ),
+        //                   )
+        //                 ],
+        //               )),
+        //         ],
+        //       ),
+        //     )
+        //     // }),
+        //     ),
         //Diagnosis Update
         GestureDetector(
             onTapDown: (_) {
@@ -130,12 +130,12 @@ class MainMenu {
                       curve: Curves.easeInOut,
                       width: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
+                          ? MediaQuery.of(context).size.height / 6
+                          : MediaQuery.of(context).size.width / 6,
                       height: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
+                          ? MediaQuery.of(context).size.height / 6
+                          : MediaQuery.of(context).size.width / 6,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 2),
                         color:
@@ -171,6 +171,82 @@ class MainMenu {
             // }),
             ),
         //Repairment Entry
+        // GestureDetector(
+        //     onTapDown: (_) {
+        //       // btnState.isTap = true;
+        //       btnState = true;
+        //     },
+        //     onTapUp: (_) {
+        //       // btnState.isTap = false;
+        //       btnState = false;
+        //       Future.delayed(const Duration(milliseconds: 200), () {
+        //         Navigator.of(context).pushAndRemoveUntil(
+        //           MaterialPageRoute(
+        //               builder: (context) => const RepairmentEntryDashboard()),
+        //           (Route<dynamic> route) => false,
+        //         );
+        //       });
+        //     },
+        //     onTapCancel: () {
+        //       // btnState.isTap = false;
+        //       btnState = false;
+        //     },
+        //     child:
+        //         // Consumer<BtnState>(builder: (context, btnState, _) {
+        //         //   return
+        //         AnimatedContainer(
+        //       duration: Duration(milliseconds: 200),
+        //       curve: Curves.easeInOut,
+        //       transform: Matrix4.translationValues(0, btnState ? 5 : 0, 0),
+        //       child: Column(
+        //         mainAxisAlignment: MainAxisAlignment.center,
+        //         children: [
+        //           AnimatedContainer(
+        //               duration: Duration(milliseconds: 200),
+        //               curve: Curves.easeInOut,
+        //               width: MediaQuery.of(context).orientation ==
+        //                       Orientation.portrait
+        //                   ? MediaQuery.of(context).size.height / 8
+        //                   : MediaQuery.of(context).size.width / 8,
+        //               height: MediaQuery.of(context).orientation ==
+        //                       Orientation.portrait
+        //                   ? MediaQuery.of(context).size.height / 8
+        //                   : MediaQuery.of(context).size.width / 8,
+        //               decoration: BoxDecoration(
+        //                 border: Border.all(color: Colors.black, width: 2),
+        //                 color:
+        //                     btnState == true ? Colors.white : Colors.blueAccent,
+        //                 borderRadius: BorderRadius.circular(10),
+        //                 boxShadow: btnState == true
+        //                     ? [
+        //                         BoxShadow(
+        //                           color: Colors.grey.withOpacity(0.3),
+        //                           spreadRadius: 5,
+        //                           blurRadius: 7,
+        //                           offset: Offset(0, 3),
+        //                         ),
+        //                       ]
+        //                     : [],
+        //               ),
+        //               child: Column(
+        //                 mainAxisAlignment: MainAxisAlignment.center,
+        //                 children: [
+        //                   Icon(Icons.bug_report_outlined),
+        //                   const SizedBox(height: 5),
+        //                   Text(
+        //                     'Repairment Entry',
+        //                     style: TextStyle(
+        //                       fontSize: 15,
+        //                     ),
+        //                   )
+        //                 ],
+        //               )),
+        //         ],
+        //       ),
+        //     )
+        //     // }),
+        //     ),
+        //Repairment Update
         GestureDetector(
             onTapDown: (_) {
               // btnState.isTap = true;
@@ -182,7 +258,7 @@ class MainMenu {
               Future.delayed(const Duration(milliseconds: 200), () {
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
-                      builder: (context) => const RepairmentEntryDashboard()),
+                      builder: (context) => const RepairmentDashboard()),
                   (Route<dynamic> route) => false,
                 );
               });
@@ -206,95 +282,18 @@ class MainMenu {
                       curve: Curves.easeInOut,
                       width: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
+                          ? MediaQuery.of(context).size.height / 6
+                          : MediaQuery.of(context).size.width / 6,
                       height: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
+                          ? MediaQuery.of(context).size.height / 6
+                          : MediaQuery.of(context).size.width / 6,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 2),
                         color:
                             btnState == true ? Colors.white : Colors.blueAccent,
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: btnState == true
-                            ? [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 3),
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.bug_report_outlined),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Repairment Entry',
-                            style: TextStyle(
-                              fontSize: 15,
-                            ),
-                          )
-                        ],
-                      )),
-                ],
-              ),
-            )
-            // }),
-            ),
-        //Repairment Update
-        GestureDetector(
-          onTapDown: (_) {
-            // btnState.isTap = true;
-            btnState = true;
-          },
-          onTapUp: (_) {
-            // btnState.isTap = false;
-            btnState = false;
-            Future.delayed(const Duration(milliseconds: 200), () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const RepairmentDashboard()),
-                (Route<dynamic> route) => false,
-              );
-            });
-          },
-          onTapCancel: () {
-            // btnState.isTap = false;
-            btnState = false;
-          },
-          child: 
-          // Consumer<BtnState>(builder: (context, btnState, _) {
-          //   return 
-            AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              transform:
-                  Matrix4.translationValues(0, btnState ? 5 : 0, 0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                      width: MediaQuery.of(context).orientation ==
-                              Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
-                      height: MediaQuery.of(context).orientation ==
-                              Orientation.portrait
-                          ? MediaQuery.of(context).size.height / 8
-                          : MediaQuery.of(context).size.width / 8,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 2),
-                        color:
-                            btnState==true ? Colors.white : Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: btnState==true
                             ? [
                                 BoxShadow(
                                   color: Colors.grey.withOpacity(0.3),
@@ -321,8 +320,8 @@ class MainMenu {
                 ],
               ),
             )
-          // }),
-        ),
+            // }),
+            ),
         //Diagnosis
         // GestureDetector(
         //   onTapDown: (_) {

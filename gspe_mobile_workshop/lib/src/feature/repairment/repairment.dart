@@ -38,19 +38,24 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
   int diagDetailId = 0;
   int proId = 0;
   int id = 0;
-  DateTime? _startRepairDate;
-  DateTime? _endRepairDate;
+  String _startRepairDate = '';
+  String _endRepairDate = '';
   bool isLoading = false;
   List<DiagnosisModule> myDiagnosis = [];
   List<PartModule> selectedInventoryPart = [];
   List<String> OldDescription = [];
   List<int> OldDuration = [];
+  List<int> OldRepairStatus = [];
   List<String> OldRemarks = [];
   List<int> OldMatrixId = [];
   List<int> OldDiagnosisMatrixId = [];
-  int OldRepairStatus = 0;
 
   List<String> _options = [
+    'Yes',
+    'No',
+  ];
+
+  List<String> _rStatus = [
     'Outstanding',
     'Done',
     'Failed',
@@ -66,7 +71,7 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
 
     if (picked != null && picked != _startRepairDate) {
       setState(() {
-        _startRepairDate = picked;
+        _startRepairDate = picked.toString();
       });
     }
   }
@@ -81,7 +86,7 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
 
     if (picked != null && picked != _endRepairDate) {
       setState(() {
-        _endRepairDate = picked;
+        _endRepairDate = picked.toString();
       });
     }
   }
@@ -96,37 +101,27 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
     int repairable = 0;
 
     // To throw away the 00:00:00 at the end of the deadline
-    int lastSpaceIndex = _startRepairDate.toString().lastIndexOf(' ');
-    String trimmedStartRepair =
-        _startRepairDate.toString().substring(0, lastSpaceIndex);
+    // int lastSpaceIndex = _startRepairDate.toString().lastIndexOf(' ');
+    // String trimmedStartRepair = _startRepairDate.substring(0, lastSpaceIndex);
 
-    int lastSpaceIndexEnd = _endRepairDate.toString().lastIndexOf(' ');
-    String trimmedEndRepair =
-        _endRepairDate.toString().substring(0, lastSpaceIndexEnd);
-
-    if (_repairableOptions == "Outstanding") {
-      repairable = 0;
-    } else if (_repairableOptions == "Done") {
-      repairable = 1;
-    } else {
-      repairable = 2;
-    }
+    // int lastSpaceIndexEnd = _endRepairDate.toString().lastIndexOf(' ');
+    // String trimmedEndRepair = _endRepairDate.substring(0, lastSpaceIndexEnd);
 
     // Map each value from the form
     Map<String, dynamic> postData = {
       "diagnosis_detail_id": diagDetailId,
       "product_id": proId,
       "id": id,
-      "repairable": OldRepairStatus,
-      "repair_start_date": trimmedStartRepair.toString(),
-      "repair_end_date": trimmedEndRepair.toString(),
+      "repairable": _repairableOptions == 'Yes' ? 1 : 0,
+      "repair_start_date": _startRepairDate,
+      "repair_end_date": _endRepairDate,
       "desc": [],
       "duration": [],
       "remark": [],
       "matrix_id": [],
       "diagnosis_matrix_id": [],
-      "repair_status": [OldRepairStatus],
-      "repair_statusNew": [repairable],
+      "repair_status": [],
+      "repair_statusNew": [],
       "descNew": [],
       "durationNew": [],
       "remarkNew": [],
@@ -159,8 +154,12 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
       postData["duration"].add(oldDura);
     }
 
+    for (var oldRStatus in OldRepairStatus) {
+      postData["repair_status"].add(oldRStatus);
+    }
+
     for (var oldRem in OldRemarks) {
-      postData["remark"].add(oldRem.toString());
+      postData["remark"].add(oldRem);
     }
 
     for (var oldMID in OldMatrixId) {
@@ -171,27 +170,30 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
       postData["diagnosis_matrix_id"].add(oldDMatrixId);
     }
 
-    for (var myDiag in myDiagnosis) {
-      String description = myDiag.description;
-      RegExp regex = RegExp(
-          r'\((.*?)\)'); // Regular expression to match the text inside parentheses
-      RegExpMatch? match = regex.firstMatch(description);
+    if (myDiagnosis.isNotEmpty) {
+      for (var myDiag in myDiagnosis) {
+        String description = myDiag.description;
+        RegExp regex = RegExp(
+            r'\((.*?)\)'); // Regular expression to match the text inside parentheses
+        RegExpMatch? match = regex.firstMatch(description);
 
-      if (match != null) {
-        String valueInParentheses =
-            match.group(1)!; // Get the value inside parentheses
+        if (match != null) {
+          String valueInParentheses =
+              match.group(1)!; // Get the value inside parentheses
 
-        String modifiedValue = valueInParentheses.toUpperCase() +
-            " REPAIR"; // Append " Repair" to the extracted value
+          String modifiedValue = valueInParentheses.toUpperCase() +
+              " REPAIR"; // Append " Repair" to the extracted value
 
-        postData["descNew"].add(modifiedValue);
-      } else {
-        postData["descNew"].add(
-            description); // If no parentheses found, add the original description
+          postData["descNew"].add(modifiedValue);
+        } else {
+          postData["descNew"].add(
+              description); // If no parentheses found, add the original description
+        }
+        postData["repair_statusNew"].add(myDiag.repairStatus);
+        postData["durationNew"].add(myDiag.duration);
+        postData["remarkNew"].add(myDiag.remarks);
+        postData["matrix_idNew"].add(myDiag.matrixId);
       }
-      postData["durationNew"].add(myDiag.duration);
-      postData["remarkNew"].add(myDiag.remarks);
-      postData["matrix_idNew"].add(myDiag.matrixId);
     }
 
     for (var selectedInven in selectedInventoryPart) {
@@ -331,6 +333,15 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                         : repairListProvider.Data[0].serialNum
                                             .toString(),
                                     onChanged: (newValues) async {
+                                      //empty all related variables before assigning a new value
+                                      myDiagnosis.clear();
+                                      OldDescription.clear();
+                                      OldDuration.clear();
+                                      OldRemarks.clear();
+                                      OldMatrixId.clear();
+                                      OldDiagnosisMatrixId.clear();
+                                      OldRepairStatus.clear();
+
                                       //assigned the selected serial number
                                       _selectedSerialNum = newValues!;
                                       final selectedSerial =
@@ -387,14 +398,8 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                           ? ''
                                           : repairDetailData[0].isRepairable ==
                                                   0
-                                              ? 'Outstanding'
-                                              : repairDetailData[0]
-                                                          .isRepairable ==
-                                                      1
-                                                  ? 'Done'
-                                                  : 'Failed';
-                                      OldRepairStatus =
-                                          repairDetailData[0].isRepairable;
+                                              ? 'No'
+                                              : 'Yes';
                                       //assign start repair date
                                       _startRepairDate =
                                           repairDetailData[0].repairStartDate;
@@ -415,7 +420,8 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                                 duration: mDiag.desc.duration,
                                                 remarks: mDiag.remark,
                                                 matrixId:
-                                                    mDiag.diagnosisMatrixId);
+                                                    mDiag.diagnosisMatrixId,
+                                                repairStatus: mDiag.status);
                                         myDiagnosis.add(oldDiagnoze);
                                         OldDescription.add(mDiag.desc.name);
                                         OldDuration.add(mDiag.duration);
@@ -423,8 +429,12 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                         OldMatrixId.add(mDiag.id);
                                         OldDiagnosisMatrixId.add(
                                             mDiag.diagnosisMatrixId);
-                                        OldRepairStatus = mDiag.status;
+                                        OldRepairStatus.add(mDiag.status);
+                                        print(
+                                            'Added repair status: ${mDiag.status}');
                                       }
+                                      print(
+                                          'OldRepairStatus: $OldRepairStatus');
 
                                       setState(() {
                                         // Perform any additional UI updates if necessary
@@ -497,11 +507,7 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                           DropdownButtonFormField(
                             value: _repairableOptions == ''
                                 ? null
-                                : _repairableOptions == 'Outstanding'
-                                    ? _options[0]
-                                    : _repairableOptions == 'Done'
-                                        ? _options[1]
-                                        : _options[2],
+                                : _repairableOptions,
                             onChanged: (newValues) {
                               setState(() {
                                 _repairableOptions = newValues!;
@@ -543,10 +549,9 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(_startRepairDate == null
+                              Text(_startRepairDate == ''
                                   ? 'Pick Start Repair Date'
-                                  : DateFormat('dd-MM-yyyy')
-                                      .format(_startRepairDate!)),
+                                  : _startRepairDate),
                               SizedBox(
                                 width: 10,
                               ),
@@ -562,10 +567,9 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(_endRepairDate == null
+                              Text(_endRepairDate == ''
                                   ? 'Pick End Repair Date'
-                                  : DateFormat('dd-MM-yyyy')
-                                      .format(_endRepairDate!)),
+                                  : _endRepairDate),
                               SizedBox(
                                 width: 10,
                               ),
@@ -616,7 +620,6 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                                   created_at: '-',
                                                   updated_at: '-'),
                                             );
-                                            //need to check and change the estimated duration of the diagnosis faulty to be editable
                                             setState(() {
                                               DiagnosisModule diagnoze =
                                                   DiagnosisModule(
@@ -670,7 +673,8 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                           0: FlexColumnWidth(1),
                                           1: FlexColumnWidth(2),
                                           2: FlexColumnWidth(2),
-                                          3: FlexColumnWidth(1),
+                                          3: FlexColumnWidth(2),
+                                          4: FlexColumnWidth(1),
                                         },
                                         children: [
                                           TableRow(
@@ -704,6 +708,16 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                                 child: Center(
                                                     child: Text(
                                                   'Remark',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )),
+                                              ),
+                                              TableCell(
+                                                child: Center(
+                                                    child: Text(
+                                                  'status',
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
@@ -801,6 +815,48 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                                                 );
                                                               });
                                                         }),
+                                                  ),
+                                                ),
+                                                TableCell(
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    value: element
+                                                                .repairStatus ==
+                                                            0
+                                                        ? 'Outstanding'
+                                                        : element.repairStatus ==
+                                                                1
+                                                            ? 'Done'
+                                                            : 'Failed',
+                                                    onChanged: (newValues) {
+                                                      int counter;
+                                                      setState(() {
+                                                        counter = myDiagnosis
+                                                            .indexOf(element);
+                                                        myDiagnosis[counter]
+                                                                .repairStatus =
+                                                            newValues ==
+                                                                    'Outstanding'
+                                                                ? 0
+                                                                : newValues ==
+                                                                        'Done'
+                                                                    ? 1
+                                                                    : 0;
+                                                      });
+                                                    },
+                                                    items: _rStatus.map<
+                                                        DropdownMenuItem<
+                                                            String>>((status) {
+                                                      return DropdownMenuItem(
+                                                        value: status,
+                                                        child: Text(status),
+                                                      );
+                                                    }).toList(),
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Status',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                    ),
                                                   ),
                                                 ),
                                                 TableCell(
@@ -1081,7 +1137,9 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                               TableCell(
                                                 child: Center(
                                                     child: Text(
-                                                  elements.qty.toString(),
+                                                  elements.qty < 0
+                                                      ? '0'
+                                                      : elements.qty.toString(),
                                                   style:
                                                       TextStyle(fontSize: 16),
                                                 )),
@@ -1089,69 +1147,95 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                               TableCell(
                                                 child: Center(
                                                   child: TextField(
-                                                      controller:
+                                                    controller:
+                                                        TextEditingController(
+                                                      text: elements.reqQty
+                                                          .toString(),
+                                                    ),
+                                                    decoration: InputDecoration(
+                                                      hintText: elements
+                                                                  .reqQty ==
+                                                              0
+                                                          ? 'Requested Quantity'
+                                                          : elements.reqQty
+                                                              .toString(),
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      _reqQtyController =
                                                           TextEditingController(
                                                         text: elements.reqQty
                                                             .toString(),
-                                                      ),
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText: elements
-                                                                    .reqQty ==
-                                                                0
-                                                            ? 'Requested Quantity'
-                                                            : elements.reqQty
-                                                                .toString(),
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10.0),
-                                                        ),
-                                                      ),
-                                                      onTap: () {
-                                                        _reqQtyController =
-                                                            TextEditingController(
-                                                          text: elements.reqQty
-                                                              .toString(),
-                                                        );
-                                                        _reqQtyController
-                                                                .selection =
-                                                            TextSelection
-                                                                .fromPosition(
-                                                          TextPosition(
-                                                              offset: elements
-                                                                  .reqQty
-                                                                  .toString()
-                                                                  .length),
-                                                        );
+                                                      );
+                                                      _reqQtyController
+                                                              .selection =
+                                                          TextSelection
+                                                              .fromPosition(
+                                                        TextPosition(
+                                                            offset: elements
+                                                                .reqQty
+                                                                .toString()
+                                                                .length),
+                                                      );
+                                                      _reqQtyController
+                                                          .addListener(() {
                                                         elements.reqQty =
                                                             int.parse(
                                                                 _reqQtyController
                                                                     .text);
-                                                        _reqQtyController
-                                                            .addListener(() {
-                                                          elements.reqQty =
-                                                              int.parse(
-                                                                  _reqQtyController
-                                                                      .text);
-                                                        });
-                                                        showDialog(
+                                                        if (elements.reqQty >
+                                                            elements.qty) {
+                                                          showDialog(
                                                             context: context,
                                                             builder: (context) {
+                                                              elements.reqQty =
+                                                                  0; // Reset reqQty to 0
                                                               return AlertDialog(
-                                                                content:
+                                                                content: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    Text(
+                                                                      'Error: Requested Quantity exceeds available stock',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.red),
+                                                                    ),
                                                                     TextField(
-                                                                  controller:
-                                                                      _reqQtyController,
-                                                                  autofocus:
-                                                                      true,
-                                                                  // ... additional text field properties ...
+                                                                      controller:
+                                                                          _reqQtyController,
+                                                                      autofocus:
+                                                                          true,
+                                                                      // ... additional text field properties ...
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               );
-                                                            });
-                                                      }),
+                                                            },
+                                                          );
+                                                        }
+                                                      });
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AlertDialog(
+                                                            content: TextField(
+                                                              controller:
+                                                                  _reqQtyController,
+                                                              autofocus: true,
+                                                              // ... additional text field properties ...
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                               TableCell(
@@ -1194,7 +1278,9 @@ class _RepairmentDashboardState extends State<RepairmentDashboard> {
                                   )),
                               ElevatedButton(
                                 onPressed: isLoading ? null : saveData,
-                                child: Text('Start Repair'),
+                                child: isLoading
+                                    ? CircularProgressIndicator()
+                                    : Text('Start Repair'),
                               ),
                             ],
                           ),
